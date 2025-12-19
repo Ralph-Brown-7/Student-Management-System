@@ -1,0 +1,5 @@
+html, body, #root { height: 100%; }
+body { background: #f7f9fc; }
+/* small helpers */
+.sidebar { min-height: 100vh; }
+.sidebar .nav-link.active { background-color: #0d6efd; color: white; }
