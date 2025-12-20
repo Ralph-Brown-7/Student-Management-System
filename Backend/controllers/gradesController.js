@@ -13,7 +13,9 @@ exports.createGrade = async (req, res) => {
 // READ ALL
 exports.getGrades = async (_req, res) => {
   try {
-    const grades = await Grade.find().populate('studentId courseId');
+    const grades = await Grade.find()
+      .populate('studentId', 'name')
+      .populate('courseId', 'name');
     res.json(grades);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -23,8 +25,13 @@ exports.getGrades = async (_req, res) => {
 // READ ONE
 exports.getGrade = async (req, res) => {
   try {
-    const grade = await Grade.findById(req.params.id).populate('studentId courseId');
-    if (!grade) return res.status(404).json({ message: 'Grade not found' });
+    const grade = await Grade.findById(req.params.id)
+      .populate('studentId', 'name')
+      .populate('courseId', 'name');
+
+    if (!grade) {
+      return res.status(404).json({ message: 'Grade not found' });
+    }
     res.json(grade);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -34,7 +41,11 @@ exports.getGrade = async (req, res) => {
 // UPDATE
 exports.updateGrade = async (req, res) => {
   try {
-    const grade = await Grade.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const grade = await Grade.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
     res.json(grade);
   } catch (err) {
     res.status(500).json({ error: err.message });

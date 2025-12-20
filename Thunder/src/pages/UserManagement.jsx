@@ -1,78 +1,67 @@
-import React, { useEffect, useState } from 'react';
-import { User as UserIcon, Trash2, Edit } from 'lucide-react';
-import api from '../api.js';
+import React, { useEffect, useState } from "react";
+import api from "../api";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await api.get('/users');
+        const res = await api.get("/users");
         setUsers(res.data);
       } catch (err) {
-        console.error('Failed to fetch users:', err);
-      } finally {
-        setLoading(false);
+        console.error("Failed to load users", err);
       }
     };
+
     fetchUsers();
   }, []);
 
-  const handleAction = async (action, user) => {
-    if (action === 'delete') {
-      if (!confirm(`Delete user ${user.name}?`)) return;
-      try {
-        await api.delete(`/users/${user.id}`);
-        setUsers(users.filter(u => u.id !== user.id));
-      } catch (err) {
-        console.error('Failed to delete user:', err);
-      }
-    } else if (action === 'edit') {
-      alert(`Edit ${user.name} (Implement your form or modal)`);
-    } else if (action === 'add') {
-      alert('Add user (Implement your form or modal)');
+  const deleteUser = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+    try {
+      await api.delete(`/users/${id}`);
+      setUsers((prev) => prev.filter((u) => u._id !== id));
+    } catch (err) {
+      alert("Failed to delete user");
     }
   };
 
-  if (loading) return <p>Loading users...</p>;
-
   return (
-    <div className="container-fluid p-4">
-      <h1 className="mb-3">User Management</h1>
-      <div className="mb-3 text-end">
-        <button className="btn btn-primary" onClick={() => handleAction('add')}>
-          <UserIcon className="me-2" /> Add User
-        </button>
-      </div>
-      <div className="table-responsive">
-        <table className="table table-hover align-middle">
-          <thead className="table-light">
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Actions</th>
+    <div>
+      <h2 className="mb-3">User Management</h2>
+
+      <table className="table table-bordered">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {users.map((u) => (
+            <tr key={u._id}>
+              <td>{u.name}</td>
+              <td>{u.email}</td>
+              <td className="text-capitalize">{u.role}</td>
+              <td>{u.status}</td>
+              <td>
+                <button
+                  className="btn btn-sm btn-danger"
+                  onClick={() => deleteUser(u._id)}
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {users.map(u => (
-              <tr key={u.id}>
-                <td>{u.name}</td>
-                <td>{u.email}</td>
-                <td className="text-capitalize">{u.role}</td>
-                <td><span className={`badge ${u.status === 'Active' ? 'bg-success' : 'bg-danger'}`}>{u.status}</span></td>
-                <td>
-                  <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => handleAction('edit', u)}><Edit size={14} /></button>
-                  <button className="btn btn-sm btn-outline-danger" onClick={() => handleAction('delete', u)}><Trash2 size={14} /></button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

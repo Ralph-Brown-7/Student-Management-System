@@ -13,7 +13,9 @@ exports.createEnrollment = async (req, res) => {
 // READ ALL
 exports.getEnrollments = async (_req, res) => {
   try {
-    const enrollments = await Enrollment.find().populate('studentId courseId');
+    const enrollments = await Enrollment.find()
+      .populate('studentId', 'name email')
+      .populate('courseId', 'name');
     res.json(enrollments);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -23,8 +25,13 @@ exports.getEnrollments = async (_req, res) => {
 // READ ONE
 exports.getEnrollment = async (req, res) => {
   try {
-    const enrollment = await Enrollment.findById(req.params.id).populate('studentId courseId');
-    if (!enrollment) return res.status(404).json({ message: 'Enrollment not found' });
+    const enrollment = await Enrollment.findById(req.params.id)
+      .populate('studentId', 'name email')
+      .populate('courseId', 'name');
+
+    if (!enrollment) {
+      return res.status(404).json({ message: 'Enrollment not found' });
+    }
     res.json(enrollment);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -34,7 +41,11 @@ exports.getEnrollment = async (req, res) => {
 // UPDATE
 exports.updateEnrollment = async (req, res) => {
   try {
-    const enrollment = await Enrollment.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const enrollment = await Enrollment.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
     res.json(enrollment);
   } catch (err) {
     res.status(500).json({ error: err.message });

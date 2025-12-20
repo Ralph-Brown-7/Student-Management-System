@@ -14,12 +14,13 @@ const Sidebar = ({ navItems, currentPage, onNavigate, userRole }) => {
             <li
               key={item.id}
               className={`mb-2 p-2 rounded ${
-                currentPage === item.id ? "bg-secondary" : ""
-              }`}
+                currentPage === item.id ? "bg-secondary text-white" : ""
+              }}
+              `}
               style={{ cursor: "pointer" }}
               onClick={() => onNavigate(item.id)}
             >
-              <item.icon className="me-2" size={16} />
+              {item.icon && <item.icon className="me-2" size={16} />}
               {item.label}
             </li>
           ))}

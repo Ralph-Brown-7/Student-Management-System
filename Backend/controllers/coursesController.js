@@ -24,7 +24,9 @@ exports.getCourses = async (_req, res) => {
 exports.getCourse = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
-    if (!course) return res.status(404).json({ message: 'Course not found' });
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
     res.json(course);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -34,7 +36,11 @@ exports.getCourse = async (req, res) => {
 // UPDATE
 exports.updateCourse = async (req, res) => {
   try {
-    const course = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const course = await Course.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
     res.json(course);
   } catch (err) {
     res.status(500).json({ error: err.message });

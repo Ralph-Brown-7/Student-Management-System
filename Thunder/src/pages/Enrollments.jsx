@@ -1,55 +1,54 @@
-import React, { useEffect, useState } from 'react';
-import api from '../api.js';
+import React, { useEffect, useState } from "react";
+import api from "../api";
 
 const Enrollments = ({ userId, userRole }) => {
   const [enrollments, setEnrollments] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEnrollments = async () => {
       try {
-        const res = await api.get('/enrollments');
+        const res = await api.get("/enrollments");
         let data = res.data;
 
-        if (userRole === 'student') data = data.filter(e => e.studentId === userId);
-        else if (userRole === 'instructor') {
-          const coursesRes = await api.get('/courses');
-          const instructorCourses = coursesRes.data.filter(c => c.instructorId === userId).map(c => c.id);
-          data = data.filter(e => instructorCourses.includes(e.courseId));
+        // Students only see their enrollments
+        if (userRole === "student") {
+          data = data.filter(
+            (e) => e.studentId && e.studentId._id === userId
+          );
         }
 
         setEnrollments(data);
       } catch (err) {
-        console.error('Failed to fetch enrollments:', err);
-      } finally {
-        setLoading(false);
+        console.error("Failed to load enrollments", err);
       }
     };
+
     fetchEnrollments();
   }, [userId, userRole]);
 
-  if (loading) return <p>Loading enrollments...</p>;
-  if (enrollments.length === 0) return <p>No enrollments found.</p>;
-
   return (
-    <div className="container-fluid p-4">
-      <h1 className="mb-3">Enrollments</h1>
-      <table className="table table-hover">
-        <thead className="table-light">
+    <div>
+      <h2 className="mb-3">Enrollments</h2>
+
+      <table className="table table-bordered">
+        <thead>
           <tr>
-            <th>Course ID</th>
-            <th>Student ID</th>
+            <th>Course</th>
+            <th>Student</th>
             <th>Status</th>
-            <th>Enrollment Date</th>
+            <th>Date</th>
           </tr>
         </thead>
+
         <tbody>
-          {enrollments.map(e => (
-            <tr key={e.id}>
-              <td>{e.courseId}</td>
-              <td>{e.studentId}</td>
+          {enrollments.map((e) => (
+            <tr key={e._id}>
+              <td>{e.courseId?.name}</td>
+              <td>{e.studentId?.name}</td>
               <td>{e.status}</td>
-              <td>{new Date(e.enrollmentDate).toLocaleDateString()}</td>
+              <td>
+                {new Date(e.enrollmentDate).toLocaleDateString()}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -58,4 +57,4 @@ const Enrollments = ({ userId, userRole }) => {
   );
 };
 
-export default Enrollments;
+export default Enrollments; // ✅ THIS LINE IS REQUIRED

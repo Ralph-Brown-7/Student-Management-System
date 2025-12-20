@@ -2,14 +2,13 @@ import React, { useState } from "react";
 
 export default function LoginPage({ onLogin, onRegister }) {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await onLogin(email, password); // Calls App.jsx login()
+      await onLogin(email);
     } catch (err) {
       alert("Login failed: " + err.message);
     } finally {
@@ -31,23 +30,10 @@ export default function LoginPage({ onLogin, onRegister }) {
             required
           />
         </div>
-
-        <div className="mb-3">
-          <label>Password</label>
-          <input
-            type="password"
-            className="form-control"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-
         <button type="submit" className="btn btn-primary" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
-
       <p className="mt-3">
         Don't have an account?{" "}
         <button className="btn btn-link p-0" onClick={onRegister}>

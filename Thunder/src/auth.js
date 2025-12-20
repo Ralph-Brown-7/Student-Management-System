@@ -1,54 +1,17 @@
 import axios from "./api";
 
-/**
- * ======================
- * REGISTER
- * ======================
- */
-export const register = async (name, email, role = "student") => {
-  const res = await axios.post("/users", {
-    name,
-    email,
-    role,
-    status: "active"
-  });
-
-  // Save token if backend sends one later (future-proof)
-  if (res.data.token) {
-    localStorage.setItem("token", res.data.token);
-  }
-
-  return {
-    userId: res.data.userId,
-    role: res.data.role,
-    user: res.data.user,
-  };
+export const register = async (name, email, password, role = "student") => {
+  const res = await axios.post("/users/register", { name, email, password, role });
+  if (res.data.token) localStorage.setItem("token", res.data.token);
+  return res.data;
 };
 
-/**
- * ======================
- * LOGIN
- * ======================
- */
-export const login = async (email) => {
-  const res = await axios.post("/users/login", { email });
-
-  // Save JWT
+export const login = async (email, password) => {
+  const res = await axios.post("/users/login", { email, password });
   localStorage.setItem("token", res.data.token);
-
-  return {
-    userId: res.data.userId,
-    role: res.data.role,
-    user: res.data.user,
-    token: res.data.token,
-  };
+  return res.data;
 };
 
-/**
- * ======================
- * LOGOUT
- * ======================
- */
 export const logout = () => {
   localStorage.removeItem("token");
 };

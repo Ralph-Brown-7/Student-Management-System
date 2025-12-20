@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 
 export default function RegisterPage({ onBack, onRegister }) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("student");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await onRegister(email, password); // Calls App.jsx register()
+      await onRegister(name, email, role);
       alert("Registration successful!");
     } catch (err) {
       alert("Registration failed: " + err.message);
@@ -23,6 +24,16 @@ export default function RegisterPage({ onBack, onRegister }) {
       <h2>Register</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
+          <label>Name</label>
+          <input
+            type="text"
+            className="form-control"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
+        <div className="mb-3">
           <label>Email</label>
           <input
             type="email"
@@ -32,18 +43,18 @@ export default function RegisterPage({ onBack, onRegister }) {
             required
           />
         </div>
-
         <div className="mb-3">
-          <label>Password</label>
-          <input
-            type="password"
-            className="form-control"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <label>Role</label>
+          <select
+            className="form-select"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          >
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+            <option value="admin">Admin</option>
+          </select>
         </div>
-
         <button type="submit" className="btn btn-success" disabled={loading}>
           {loading ? "Registering..." : "Register"}
         </button>
