@@ -2,50 +2,75 @@ import React, { useState } from "react";
 import Dashboard from "./pages/Dashboard.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
-import api from "./api.js"; // your API helper
+import api from "./api.js";
 
-export default function App() {
-  const [currentPage, setCurrentPage] = useState("login"); // login/register/dashboard
+function App() {
+  const [currentPage, setCurrentPage] = useState("login");
   const [userId, setUserId] = useState(null);
   const [userRole, setUserRole] = useState(null);
 
-  // Login handler
-  const handleLogin = async (email) => {
-    const res = await api.post("/login", { email });
-    if (res.data.success) {
+  /* ========= LOGIN ========= */
+  const handleLogin = async (email, password) => {
+    try {
+      // We now send both email and password
+      const res = await api.post("/users/login", { email, password });
+
       setUserId(res.data.userId);
       setUserRole(res.data.role);
-      setCurrentPage("dashboard"); // go to dashboard
-    } else {
-      alert("Login failed!");
+      localStorage.setItem("token", res.data.token);
+
+      setCurrentPage("dashboard");
+    } catch (err) {
+      alert(
+        "Login failed: " +
+          (err.response?.data?.message || err.message)
+      );
     }
   };
 
-  // Register handler
-  const handleRegister = async (name, email, role) => {
-    const res = await api.post("/register", { name, email, role });
-    if (res.data.success) {
-      setUserId(res.data.userId);
-      setUserRole(res.data.role);
-      setCurrentPage("dashboard"); // go to dashboard
-    } else {
-      alert("Registration failed!");
+  /* ======== REGISTER ======== */
+  const handleRegister = async (name, email, password, role) => {
+    try {
+      // We now send name, email, password, and role
+      const res = await api.post("/users/register", {
+        name,
+        email,
+        password,
+        role,
+      });
+
+      alert("Registration successful! Please login with your new password.");
+      setCurrentPage("login");
+    } catch (err) {
+      alert(
+        "Registration failed: " +
+          (err.response?.data?.message || err.message)
+      );
     }
   };
 
-  // Navigation between login/register
-  const goToRegister = () => setCurrentPage("register");
-  const goToLogin = () => setCurrentPage("login");
-
-  // Render page
-  switch (currentPage) {
-    case "login":
-      return <LoginPage onLogin={handleLogin} onRegister={goToRegister} />;
-    case "register":
-      return <RegisterPage onRegister={handleRegister} onBack={goToLogin} />;
-    case "dashboard":
-      return <Dashboard userId={userId} userRole={userRole} />;
-    default:
-      return <p>Page not found</p>;
+  /* ======== VIEW LOGIC ======== */
+  if (currentPage === "login") {
+    return (
+      <LoginPage
+        onLogin={handleLogin}
+        onRegister={() => setCurrentPage("register")}
+      />
+    );
   }
+
+  if (currentPage === "register") {
+    return (
+      <RegisterPage
+        onRegister={handleRegister}
+        onBack={() => setCurrentPage("login")}
+      />
+    );
+  }
+
+  // If logged in, show Dashboard
+  return <Dashboard userId={userId} userRole={userRole} />;
 }
+
+// Ensure this matches the function name exactly
+export default App;
