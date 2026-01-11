@@ -1,0 +1,12 @@
+# Dependency folders
+node_modules/
+**/node_modules/
+
+# Environment variables (Safety first!)
+.env
+.env.local
+
+# Build folders
+dist/
+build/
+.vite/
